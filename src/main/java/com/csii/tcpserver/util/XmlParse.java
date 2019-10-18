@@ -11,6 +11,8 @@ import java.util.*;
 
 public class XmlParse {
     public static Map parse(String xml) throws DocumentException {
+
+        System.out.println(xml);
         //1.创建Reader对象
         SAXReader reader = new SAXReader();
         //2.加载xml

@@ -35,7 +35,7 @@ public class ServerThread extends Thread {
             String str;
             String s="";
             while ((str = bufferedReader.readLine()) != null) {
-                s += str;
+                s += "\n"+str;
             }
             if (!"".equals(s)) {
                 System.out.println("I am Server, now get message from Client: " + s);
