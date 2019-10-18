@@ -2,7 +2,12 @@ package com.csii.tcpserver.core;
 
 import com.csii.tcpserver.handler.Handler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,17 +18,15 @@ import java.net.Socket;
  * 9  * <p>
  * 11
  */
+@Component
 public class TCPServer {
+    @Value("${socket.server.port}")
     private int port;
-    ServerSocket serverSocket;
-    @Autowired
+   @Autowired
+   @Qualifier("handler")
     Handler handler;
-    public TCPServer(int port) throws IOException {
-        this.port=port;
-        serverSocket = new ServerSocket(port);
-    }
-
     public synchronized void startServer() throws IOException {
+        ServerSocket serverSocket=new ServerSocket(port);
         int count = 0;
         while (true) {
             final Socket socket = serverSocket.accept();

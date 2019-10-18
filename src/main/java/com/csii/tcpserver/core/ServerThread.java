@@ -1,6 +1,7 @@
 package com.csii.tcpserver.core;
 
 import com.csii.tcpserver.handler.Handler;
+import org.dom4j.DocumentException;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +16,6 @@ public class ServerThread extends Thread {
     public ServerThread(Socket socket , Handler handler){
         this.socket = socket;
         this.handler=handler;
-        this.handler=new Handler();
     }
 
     @Override
@@ -33,9 +33,13 @@ public class ServerThread extends Thread {
             bufferedReader = new BufferedReader(inputStreamReader);
 
             String str;
-            if ((str = bufferedReader.readLine()) != null) {
-                System.out.println("I am Server, now get message from Client: " + str);
-                str=handler.handler(str);//接收到数据我们解析数据
+            String s="";
+            while ((str = bufferedReader.readLine()) != null) {
+                s += str;
+            }
+            if (!"".equals(s)) {
+                System.out.println("I am Server, now get message from Client: " + s);
+                str=handler.handler(s);//接收到数据我们解析数据
             }else
                 str="请求数据为空";
             socket.shutdownInput();
@@ -46,7 +50,7 @@ public class ServerThread extends Thread {
             System.out.println(str);
             printWriter.flush();
 
-        } catch (IOException e) {
+        } catch (IOException | DocumentException e) {
             e.printStackTrace();
         } finally {
             // 关闭资源
