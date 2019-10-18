@@ -23,10 +23,6 @@ public class XMLHandler extends Handler{
          */
         Map map=XmlParse.parse(body);
 
-
-//        InputStream in = this.getClass().getResourceAsStream(apiPath+"/"+name+".xls");
-
-
         return body;
     }
 }
