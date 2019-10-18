@@ -1,6 +1,9 @@
 package com.csii.tcpserver.handler;
 
+import com.csii.tcpserver.util.JSONParse;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class JSONHandler extends Handler{
@@ -11,6 +14,8 @@ public class JSONHandler extends Handler{
      */
     @Override
     public String handler(String name,String body){
-        return body;
+        //解析json字符串
+        Map map = JSONParse.parse(body);
+        return map.toString();
     }
 }
