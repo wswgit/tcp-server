@@ -27,11 +27,11 @@ public class XmlParse {
         while (iterator.hasNext()) {
             Element element = (Element) iterator.next();
             List<Attribute> attributes = element.attributes();
-            System.out.println("======获取属性值======");
             for (Attribute attribute : attributes) {
+                System.out.println("======获取属性值======");
                 System.out.println(attribute.getValue());
             }
-            if (element.isRootElement()) {
+            if (!element.isTextOnly()) {
                 if ("list".equalsIgnoreCase(element.getName())) {
                     List childList = new ArrayList();
                     map.put(element.getName(), childList);
@@ -60,7 +60,7 @@ public class XmlParse {
             for (Attribute attribute : attributes) {
                 System.out.println(attribute.getValue());
             }
-            if (element.isRootElement()) {
+            if (!element.isTextOnly()) {
                 if ("list".equalsIgnoreCase(element.getName())) {
                     List childList = new ArrayList();
                     map.put(element.getName(), childList);
