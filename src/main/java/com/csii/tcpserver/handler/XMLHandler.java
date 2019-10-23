@@ -1,11 +1,9 @@
 package com.csii.tcpserver.handler;
 
-import com.csii.tcpserver.util.XmlParse;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Component
 public class XMLHandler extends Handler{
