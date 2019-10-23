@@ -2,6 +2,7 @@ package com.csii.tcpserver.Bean;
 
 public class Node {
     String name;//字段名称
+    String desc ;//字段描述
     String type;//字段类型
     int length;//字段长度限制
     String reg;//字段正则限制
@@ -13,6 +14,14 @@ public class Node {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public String getType() {

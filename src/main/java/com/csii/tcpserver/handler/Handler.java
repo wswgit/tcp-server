@@ -6,9 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.io.IOException;
 
 @Component
 public class Handler implements ApplicationContextAware {
@@ -24,7 +23,7 @@ public class Handler implements ApplicationContextAware {
     String apiPath = "api-files";
     Handler handler;
 
-    public String handler(String message) throws DocumentException {
+    public String handler(String message) throws DocumentException, IOException {
         String type;
         String name;
         String body;
@@ -57,7 +56,7 @@ public class Handler implements ApplicationContextAware {
         applicationContext = applicationContextParam;
     }
 
-    public String handler(String name, String body) throws DocumentException {
+    public String handler(String name, String body) throws DocumentException, IOException {
         return "";
     }
 }
