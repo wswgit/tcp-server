@@ -1,13 +1,14 @@
-package com.csii.tcpserver.util;
+package com.csii.tcpserver.parser;
 
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
-
-public class JSONParse {
-    public static Map parse(String jsonStr){
+@Component
+public class JSONParse implements Parser {
+    public Map parse(String jsonStr){
         Map map = new HashMap();
         // 把字符串转化为json对象
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
@@ -21,7 +22,7 @@ public class JSONParse {
                 while(it.hasNext()){
                     JSONObject json2 = (JSONObject) it.next();
                     // 递归
-                    list.add(JSONParse.parse(json2.toString()));
+                    list.add(parse(json2.toString()));
                 }
                 map.put(key,list);
             }else{
@@ -30,5 +31,4 @@ public class JSONParse {
         }
         return map;
     }
-
 }

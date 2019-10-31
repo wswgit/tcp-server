@@ -1,5 +1,6 @@
-package com.csii.tcpserver.util;
+package com.csii.tcpserver.parser;
 
+import com.csii.tcpserver.Bean.Node;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -116,10 +117,7 @@ public class ExcelAPIParse {
             }
             int firstCellIndex = row.getFirstCellNum();
             int lastCellIndex = row.getLastCellNum();
-
-            Map rowMap = null;
-            if (!"".equals(inReqOrRes))
-                rowMap = new HashMap();
+            Node node = null;
             for (int index = firstCellIndex; index < lastCellIndex; index++) {   //遍历列
                 Cell cell = row.getCell(index);
                 if (cell == null)
@@ -137,27 +135,38 @@ public class ExcelAPIParse {
                     apiCode += row.getCell(index + 1).toString();
                 } else if (value.contains("(REQ)") && inAPI) {
                     map.put(apiCode, apiMap);
-                    rowMap = new HashMap();
                     titleRow = rowIndex - 1;
                     inReqOrRes = "REQ";
                 } else if (value.contains("(RES)") && inAPI) {
                     inReqOrRes = "RES";
-                } else if ("REQ".equalsIgnoreCase(inReqOrRes)) {
+                } else if ("REQ".equalsIgnoreCase(inReqOrRes)||"RES".equalsIgnoreCase(inReqOrRes)) {
                     String title = sheet.getRow(titleRow).getCell(index).toString();
-                    rowMap.put(title.substring(title.indexOf("(") + 1, title.length() - 1), value);
-                } else if ("RES".equalsIgnoreCase(inReqOrRes)) {
-                    String title = sheet.getRow(titleRow).getCell(index).toString();
-                    rowMap.put(title.substring(title.indexOf("(") + 1, title.length() - 1), value);
+                    title=title.substring(title.indexOf("(") + 1, title.length() - 1);
+                    if(node==null)
+                        node=new Node();
+                    if ("FN".equalsIgnoreCase(title)) {
+                        node.setName(value);
+                    } else if ("FD".equalsIgnoreCase(title)) {
+                        node.setDesc(value);
+                    } else if ("T".equalsIgnoreCase(title)) {
+                        node.setType(value);
+                    } else if ("L".equalsIgnoreCase(title)) {
+                        node.setLength((Double.valueOf(value).intValue()));
+                    } else if ("M".equalsIgnoreCase(title)) {
+                        node.setMust("Y".equalsIgnoreCase(value));
+                    }
                 }
             }
             if ("REQ".equalsIgnoreCase(inReqOrRes)) {
                 if (row.getCell(1) == null)
                     throw new IOException("字段名称列不能为空");
-                reqMap.put(row.getCell(1).toString(), rowMap);
+                if(!row.getCell(1).toString().contains("list("))
+                    reqMap.put(row.getCell(1).toString(), node);
             } else if ("RES".equalsIgnoreCase(inReqOrRes)) {
                 if (row.getCell(1) == null)
                     throw new IOException("字段名称列不能为空");
-                resMap.put(row.getCell(1).toString(), rowMap);
+                if(!row.getCell(1).toString().contains("list("))
+                    resMap.put(row.getCell(1).toString(), node);
             }
         }
         System.out.println(map);
