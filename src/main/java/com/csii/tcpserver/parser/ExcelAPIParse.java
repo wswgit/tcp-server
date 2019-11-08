@@ -139,11 +139,11 @@ public class ExcelAPIParse {
                     inReqOrRes = "REQ";
                 } else if (value.contains("(RES)") && inAPI) {
                     inReqOrRes = "RES";
-                } else if ("REQ".equalsIgnoreCase(inReqOrRes)||"RES".equalsIgnoreCase(inReqOrRes)) {
+                } else if ("REQ".equalsIgnoreCase(inReqOrRes) || "RES".equalsIgnoreCase(inReqOrRes)) {
                     String title = sheet.getRow(titleRow).getCell(index).toString();
-                    title=title.substring(title.indexOf("(") + 1, title.length() - 1);
-                    if(node==null)
-                        node=new Node();
+                    title = title.substring(title.indexOf("(") + 1, title.length() - 1);
+                    if (node == null)
+                        node = new Node();
                     if ("FN".equalsIgnoreCase(title)) {
                         node.setName(value);
                     } else if ("FD".equalsIgnoreCase(title)) {
@@ -155,18 +155,14 @@ public class ExcelAPIParse {
                     } else if ("M".equalsIgnoreCase(title)) {
                         node.setMust("Y".equalsIgnoreCase(value));
                     }
+                    if (row.getCell(1) == null)
+                        throw new IOException("字段名称列不能为空");
+                    if (!row.getCell(1).toString().contains("list("))
+                        if ("REQ".equalsIgnoreCase(inReqOrRes))
+                            reqMap.put(row.getCell(1).toString(), node);
+                        else
+                            resMap.put(row.getCell(1).toString(), node);
                 }
-            }
-            if ("REQ".equalsIgnoreCase(inReqOrRes)) {
-                if (row.getCell(1) == null)
-                    throw new IOException("字段名称列不能为空");
-                if(!row.getCell(1).toString().contains("list("))
-                    reqMap.put(row.getCell(1).toString(), node);
-            } else if ("RES".equalsIgnoreCase(inReqOrRes)) {
-                if (row.getCell(1) == null)
-                    throw new IOException("字段名称列不能为空");
-                if(!row.getCell(1).toString().contains("list("))
-                    resMap.put(row.getCell(1).toString(), node);
             }
         }
         System.out.println(map);
@@ -174,15 +170,85 @@ public class ExcelAPIParse {
     }
 
 
-    private static Map analysisAPIHead(Sheet sheet, int firstRowIndex, int lastRowIndex) {
+    /**
+     * @param sheet
+     * @return
+     * @steps 1.获取到编辑有API的sheet
+     * 2.空行为接口之间的分隔
+     * 3.遍历行列
+     * 4.遍历到包含"(TC)"为一个接口定义开始,"(TC)"为子接口
+     * 5.
+     */
+    private static Map analysisAPIHead(Sheet sheet, int firstRowIndex, int lastRowIndex) throws IOException {
         Map map = new HashMap();
+        Map apiMap = new HashMap();
+        Map reqMap = new HashMap();
+        Map resMap = new HashMap();
+        apiMap.put("Req", reqMap);
+        apiMap.put("Res", resMap);
+        int titleRow = 0;
+        boolean inAPI = false;
+        String inReqOrRes = "";
+        String apiCode = "";
 
-        for (int rIndex = firstRowIndex + 1; rIndex <= lastRowIndex; rIndex++) {   //遍历行
-            Row row = sheet.getRow(rIndex);
+        for (int rowIndex = firstRowIndex + 1; rowIndex <= lastRowIndex; rowIndex++) {   //遍历行
+            Row row = sheet.getRow(rowIndex);
+            if (row == null) {
+                inAPI = false;
+                inReqOrRes = "";
+                continue;
+            }
+            int firstCellIndex = row.getFirstCellNum();
+            int lastCellIndex = row.getLastCellNum();
+            Node node = null;
+            for (int index = firstCellIndex; index < lastCellIndex; index++) {   //遍历列
+                Cell cell = row.getCell(index);
+                if (cell == null)
+                    continue;
+                String value = cell.toString();
+                if (value.contains("(TC)") && !inAPI) {
+                    inAPI = true;
+                    inReqOrRes = "";
+                    if (row.getCell(index + 1) == null)
+                        throw new IOException("交易码需要值");
+                    apiCode += row.getCell(index + 1).toString();
+                } else if (value.contains("(STC)") && inAPI) {
+                    if (row.getCell(index + 1) == null)
+                        throw new IOException("子交易码需要值");
+                    apiCode += row.getCell(index + 1).toString();
+                } else if (value.contains("(REQ)") && inAPI) {
+                    map.put(apiCode, apiMap);
+                    titleRow = rowIndex - 1;
+                    inReqOrRes = "REQ";
+                } else if (value.contains("(RES)") && inAPI) {
+                    inReqOrRes = "RES";
+                } else if ("REQ".equalsIgnoreCase(inReqOrRes) || "RES".equalsIgnoreCase(inReqOrRes)) {
+                    String title = sheet.getRow(titleRow).getCell(index).toString();
+                    title = title.substring(title.indexOf("(") + 1, title.length() - 1);
+                    if (node == null)
+                        node = new Node();
+                    if ("FN".equalsIgnoreCase(title)) {
+                        node.setName(value);
+                    } else if ("FD".equalsIgnoreCase(title)) {
+                        node.setDesc(value);
+                    } else if ("T".equalsIgnoreCase(title)) {
+                        node.setType(value);
+                    } else if ("L".equalsIgnoreCase(title)) {
+                        node.setLength((Double.valueOf(value).intValue()));
+                    } else if ("M".equalsIgnoreCase(title)) {
+                        node.setMust("Y".equalsIgnoreCase(value));
+                    }
+                    if (row.getCell(1) == null)
+                        throw new IOException("字段名称列不能为空");
+                    if (!row.getCell(1).toString().contains("list("))
+                        if ("REQ".equalsIgnoreCase(inReqOrRes))
+                            reqMap.put(row.getCell(1).toString(), node);
+                        else
+                            resMap.put(row.getCell(1).toString(), node);
+                }
+            }
         }
-
-
+        System.out.println(map);
         return map;
     }
-
 }

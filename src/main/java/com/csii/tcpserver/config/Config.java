@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 @Configuration
 public class Config {
@@ -31,5 +34,19 @@ public class Config {
         } catch (Exception e) {
             System.out.println("AAAAAAA");
         }
+    }
+
+
+    public int lastStoneWeight(int[] stones) {
+        //int x = maxX;
+        //int y = maxY;
+        List list= Arrays.asList(stones);
+        list.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return 0;
+            }
+        });
+        return stones[stones.length-1];
     }
 }
